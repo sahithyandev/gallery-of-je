@@ -1,7 +1,6 @@
-export interface ImageObj {
-	src: string;
-	size: {
-		width: number;
-		height: number;
-	};
+export interface ImageInfoObj {
+	downloadUrl: string;
+	width: number;
+	height: number;
+	downloadCount: number;
 }

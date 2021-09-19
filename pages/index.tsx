@@ -3,25 +3,28 @@ import Head from "next/head";
 // import Image from "next/image";
 
 import { ImageCard, Footer } from "../components";
-import { ImageObj } from "../types";
+import { ImageInfoObj } from "../types";
 
 import JE from "../assets/JE.png";
+import GalleryOfJE from "../assets/gallery-of-je.png";
 import { InstagramIcon } from "../assets/icons";
 import styles from "../styles/Home.module.css";
 import { useEffect, useRef, useState } from "react";
 
+import supabase from "../models/supabase-connection";
+
 interface Props {
-	latestImages: ImageObj[];
+	latestImages: ImageInfoObj[];
 }
 
-const columnHeight = (columnImages: ImageObj[]) => {
+const columnHeight = (columnImages: ImageInfoObj[]) => {
 	return columnImages.reduce(
-		(height, currentImage) => height + currentImage.size.height,
+		(height, currentImage) => height + currentImage.height,
 		0
 	);
 };
 
-const findSmallImageColumn = (column: ImageObj[][]) => {
+const findSmallImageColumn = (column: ImageInfoObj[][]) => {
 	const heights = column.map(columnHeight);
 
 	return column[heights.findIndex((v) => v === Math.min(...heights))];
@@ -29,7 +32,7 @@ const findSmallImageColumn = (column: ImageObj[][]) => {
 
 export default function Home(props: Props) {
 	const mainElementRef = useRef<HTMLElement>();
-	const [imageColumns, setImageColumns] = useState<ImageObj[][]>([
+	const [imageColumns, setImageColumns] = useState<ImageInfoObj[][]>([
 		props.latestImages,
 	]);
 
@@ -46,7 +49,7 @@ export default function Home(props: Props) {
 				"--column-count"
 			)
 		);
-		let imageColumnsTemp = new Array<ImageObj[]>(galleryColumnCount)
+		let imageColumnsTemp = new Array<ImageInfoObj[]>(galleryColumnCount)
 			.fill(null)
 			.map(() => new Array());
 
@@ -73,9 +76,15 @@ export default function Home(props: Props) {
 						className={styles.profileCard_image}
 					/>
 					<div className={styles.profileCard_secondColumn}>
-						<h1 className={styles.profileCard_title}>Gallery Of JE</h1>
+						<img
+							src={GalleryOfJE.src}
+							width={GalleryOfJE.width}
+							height={GalleryOfJE.height}
+							className={styles.profileCard_titleImage}
+						/>
 						<p className={styles.profileCard_description}>
-							High-quality wallpapers
+							Retouched photos using Lightroom CC & Photoshop. Reach me out on
+							Instagram for the Presets Dngs used in these images.
 						</p>
 						<div className={styles.profileCard_socialLinks}>
 							{links.map((link) => {
@@ -94,7 +103,7 @@ export default function Home(props: Props) {
 						return (
 							<div key={i} className={styles.imagesContainer_column}>
 								{imageColumn.map((image) => {
-									return <ImageCard {...image} key={image.src} />;
+									return <ImageCard {...image} key={image.downloadUrl} />;
 								})}
 							</div>
 						);
@@ -108,79 +117,7 @@ export default function Home(props: Props) {
 }
 
 export const getStaticProps: GetStaticProps = async () => {
-	// TODO load them from database
-	const latestImages: ImageObj[] = [
-		{
-			src: "/images/1.jpg",
-			size: {
-				width: 1080,
-				height: 2340,
-			},
-		},
-		{
-			src: "/images/2.jpg",
-			size: {
-				width: 1080,
-				height: 2340,
-			},
-		},
-		{
-			src: "/images/3.jpg",
-			size: {
-				width: 1639,
-				height: 2048,
-			},
-		},
-		{
-			src: "/images/4.jpeg",
-			size: {
-				width: 1319,
-				height: 1600,
-			},
-		},
-		{
-			src: "/images/5.jpg",
-			size: {
-				width: 1080,
-				height: 1350,
-			},
-		},
-		{
-			src: "/images/6.jpg",
-			size: {
-				width: 752,
-				height: 1128,
-			},
-		},
-		{
-			src: "/images/7.jpg",
-			size: {
-				width: 1080,
-				height: 1350,
-			},
-		},
-		{
-			src: "/images/8.jpg",
-			size: {
-				width: 1080,
-				height: 1354,
-			},
-		},
-		{
-			src: "/images/9.jpg",
-			size: {
-				width: 660,
-				height: 1037,
-			},
-		},
-		{
-			src: "/images/10.jpg",
-			size: {
-				width: 1000,
-				height: 1500,
-			},
-		},
-	];
+	const latestImages = await supabase.getAllImages();
 
 	return {
 		props: {
