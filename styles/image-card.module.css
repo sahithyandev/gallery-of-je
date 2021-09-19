@@ -1,16 +1,21 @@
 .container {
-	--margin: 4px;
-	max-width: calc(var(--image-card-width, 360px) - var(--margin) * 2);
+	--normal-width: 360px;
+	width: var(--image-card-width, var(--normal-width));
 	height: fit-content;
 
 	position: relative;
 
-	margin: 4px;
 	border-radius: 5px;
 	overflow: hidden;
 
 	transform: scale(1);
 	transition: box-shadow 0.25s ease-in-out, transform 0.2s ease-in-out;
+}
+
+@media (max-width: 500px) {
+	.container {
+		max-width: 320px;
+	}
 }
 
 .container:hover {

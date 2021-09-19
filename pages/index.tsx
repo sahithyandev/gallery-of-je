@@ -8,12 +8,31 @@ import { ImageObj } from "../types";
 import JE from "../assets/JE.png";
 import { InstagramIcon } from "../assets/icons";
 import styles from "../styles/Home.module.css";
+import { useEffect, useRef, useState } from "react";
 
 interface Props {
 	latestImages: ImageObj[];
 }
 
+const columnHeight = (columnImages: ImageObj[]) => {
+	return columnImages.reduce(
+		(height, currentImage) => height + currentImage.size.height,
+		0
+	);
+};
+
+const findSmallImageColumn = (column: ImageObj[][]) => {
+	const heights = column.map(columnHeight);
+
+	return column[heights.findIndex((v) => v === Math.min(...heights))];
+};
+
 export default function Home(props: Props) {
+	const mainElementRef = useRef<HTMLElement>();
+	const [imageColumns, setImageColumns] = useState<ImageObj[][]>([
+		props.latestImages,
+	]);
+
 	const links = [
 		{
 			icon: InstagramIcon,
@@ -21,13 +40,31 @@ export default function Home(props: Props) {
 		},
 	];
 
+	useEffect(() => {
+		let galleryColumnCount = parseInt(
+			getComputedStyle(mainElementRef.current).getPropertyValue(
+				"--column-count"
+			)
+		);
+		let imageColumnsTemp = new Array<ImageObj[]>(galleryColumnCount)
+			.fill(null)
+			.map(() => new Array());
+
+		for (const image of props.latestImages) {
+			const parentColumn = findSmallImageColumn(imageColumnsTemp);
+			parentColumn.push(image);
+		}
+
+		setImageColumns(imageColumnsTemp);
+	}, [mainElementRef]);
+
 	return (
 		<div className={styles.homePageContainer}>
 			<Head>
 				<title>Gallery Of JE</title>
 			</Head>
 
-			<main className={styles.main}>
+			<main className={styles.main} ref={mainElementRef}>
 				<div className={styles.profileCard}>
 					<img
 						src={JE.src}
@@ -35,21 +72,32 @@ export default function Home(props: Props) {
 						height={JE.height}
 						className={styles.profileCard_image}
 					/>
-					<h1 className={styles.profileCard_title}>Gallery Of JE</h1>
-					<div className={styles.profileCard_socialLinks}>
-						{links.map((link) => {
-							return (
-								<a href={link.url}>
-									<img src={link.icon.src} />
-								</a>
-							);
-						})}
+					<div className={styles.profileCard_secondColumn}>
+						<h1 className={styles.profileCard_title}>Gallery Of JE</h1>
+						<p className={styles.profileCard_description}>
+							High-quality wallpapers
+						</p>
+						<div className={styles.profileCard_socialLinks}>
+							{links.map((link) => {
+								return (
+									<a key={link.url} href={link.url}>
+										<img src={link.icon.src} />
+									</a>
+								);
+							})}
+						</div>
 					</div>
 				</div>
 
 				<div className={styles.imagesContainer}>
-					{props.latestImages.map((imageObj) => {
-						return <ImageCard key={imageObj.src} {...imageObj} />;
+					{imageColumns.map((imageColumn, i) => {
+						return (
+							<div key={i} className={styles.imagesContainer_column}>
+								{imageColumn.map((image) => {
+									return <ImageCard {...image} key={image.src} />;
+								})}
+							</div>
+						);
 					})}
 				</div>
 			</main>
@@ -88,6 +136,48 @@ export const getStaticProps: GetStaticProps = async () => {
 			size: {
 				width: 1319,
 				height: 1600,
+			},
+		},
+		{
+			src: "/images/5.jpg",
+			size: {
+				width: 1080,
+				height: 1350,
+			},
+		},
+		{
+			src: "/images/6.jpg",
+			size: {
+				width: 752,
+				height: 1128,
+			},
+		},
+		{
+			src: "/images/7.jpg",
+			size: {
+				width: 1080,
+				height: 1350,
+			},
+		},
+		{
+			src: "/images/8.jpg",
+			size: {
+				width: 1080,
+				height: 1354,
+			},
+		},
+		{
+			src: "/images/9.jpg",
+			size: {
+				width: 660,
+				height: 1037,
+			},
+		},
+		{
+			src: "/images/10.jpg",
+			size: {
+				width: 1000,
+				height: 1500,
 			},
 		},
 	];
