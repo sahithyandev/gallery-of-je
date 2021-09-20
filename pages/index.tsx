@@ -1,6 +1,5 @@
 import { GetStaticProps } from "next";
 import Head from "next/head";
-// import Image from "next/image";
 
 import { ImageCard, Footer } from "../components";
 import { ImageInfoObjLocal } from "../types";
@@ -43,22 +42,38 @@ export default function Home(props: Props) {
 		},
 	];
 
+	const _columnResize = () => {
+		let oldGalleryColumnCount = 1;
+		return () => {
+			let galleryColumnCount = parseInt(
+				getComputedStyle(mainElementRef.current).getPropertyValue(
+					"--column-count"
+				)
+			);
+
+			if (galleryColumnCount === oldGalleryColumnCount) return;
+
+			let imageColumnsTemp = new Array<ImageInfoObjLocal[]>(galleryColumnCount)
+				.fill(null)
+				.map(() => new Array());
+
+			for (const image of props.latestImages) {
+				const parentColumn = findSmallImageColumn(imageColumnsTemp);
+				parentColumn.push(image);
+			}
+
+			oldGalleryColumnCount = galleryColumnCount;
+			setImageColumns(imageColumnsTemp);
+		};
+	};
+
 	useEffect(() => {
-		let galleryColumnCount = parseInt(
-			getComputedStyle(mainElementRef.current).getPropertyValue(
-				"--column-count"
-			)
-		);
-		let imageColumnsTemp = new Array<ImageInfoObjLocal[]>(galleryColumnCount)
-			.fill(null)
-			.map(() => new Array());
-
-		for (const image of props.latestImages) {
-			const parentColumn = findSmallImageColumn(imageColumnsTemp);
-			parentColumn.push(image);
-		}
-
-		setImageColumns(imageColumnsTemp);
+		const columnResize = _columnResize();
+		columnResize();
+		console.log("effect");
+		window.addEventListener("resize", () => {
+			columnResize();
+		});
 	}, [mainElementRef]);
 
 	return (

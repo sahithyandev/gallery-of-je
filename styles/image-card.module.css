@@ -12,12 +12,6 @@
 	transition: box-shadow 0.25s ease-in-out, transform 0.2s ease-in-out;
 }
 
-@media (max-width: 500px) {
-	.container {
-		max-width: 320px;
-	}
-}
-
 .container:hover {
 	transform: scale(1.02);
 	box-shadow: 0px -2px 33px 3px rgba(0, 0, 0, 0.1);
@@ -51,4 +45,15 @@
 	--size: 25px;
 	width: var(--size);
 	height: var(--size);
+}
+
+@media (max-width: 500px) {
+	.container {
+		max-width: 320px;
+	}
+	.container .downloadIconContainer {
+		display: block;
+		pointer-events: auto;
+		cursor: pointer;
+	}
 }
