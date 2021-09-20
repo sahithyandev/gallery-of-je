@@ -16,6 +16,7 @@
   "devDependencies": {
     "@types/node": "^16.9.1",
     "@types/react": "^17.0.21",
+    "isomorphic-fetch": "^3.0.0",
     "typescript": "^4.4.3"
   }
 }

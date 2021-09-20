@@ -1,8 +1,11 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { ImageInfoObj } from "../types";
 
 class SupabaseConnection {
 	private client: SupabaseClient;
 	static IMAGE_INFO_COLLECTION = "imageInfo";
+	static PUBLIC_IMAGE_STORAGE =
+		"https://erwfxmftkzktexefxtdy.supabase.in/storage/v1/object/public/images";
 
 	constructor() {
 		const SUPABASE_URL = process.env.SUPABASE_URL || "";
@@ -15,9 +18,9 @@ class SupabaseConnection {
 		console.log("supabase init");
 	}
 
-	async getAllImages() {
+	async getAllImages(): Promise<ImageInfoObj[]> {
 		const { data, error } = await this.client
-			.from(SupabaseConnection.IMAGE_INFO_COLLECTION)
+			.from<ImageInfoObj>(SupabaseConnection.IMAGE_INFO_COLLECTION)
 			.select();
 
 		if (error) {
@@ -25,6 +28,18 @@ class SupabaseConnection {
 		}
 
 		return data;
+	}
+
+	imageUrl(downloadFilename: string) {
+		return `${SupabaseConnection.PUBLIC_IMAGE_STORAGE}/${downloadFilename}`;
+	}
+
+	async incrementDownloadCount(downloadFilename: string) {
+		const { error } = await this.client.rpc("image_downloaded", {
+			download_filename: downloadFilename,
+		});
+
+		if (error) throw error;
 	}
 }
 

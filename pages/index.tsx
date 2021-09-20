@@ -3,7 +3,7 @@ import Head from "next/head";
 // import Image from "next/image";
 
 import { ImageCard, Footer } from "../components";
-import { ImageInfoObj } from "../types";
+import { ImageInfoObjLocal } from "../types";
 
 import JE from "../assets/JE.png";
 import GalleryOfJE from "../assets/gallery-of-je.png";
@@ -14,17 +14,17 @@ import { useEffect, useRef, useState } from "react";
 import supabase from "../models/supabase-connection";
 
 interface Props {
-	latestImages: ImageInfoObj[];
+	latestImages: ImageInfoObjLocal[];
 }
 
-const columnHeight = (columnImages: ImageInfoObj[]) => {
+const columnHeight = (columnImages: ImageInfoObjLocal[]) => {
 	return columnImages.reduce(
 		(height, currentImage) => height + currentImage.height,
 		0
 	);
 };
 
-const findSmallImageColumn = (column: ImageInfoObj[][]) => {
+const findSmallImageColumn = (column: ImageInfoObjLocal[][]) => {
 	const heights = column.map(columnHeight);
 
 	return column[heights.findIndex((v) => v === Math.min(...heights))];
@@ -32,7 +32,7 @@ const findSmallImageColumn = (column: ImageInfoObj[][]) => {
 
 export default function Home(props: Props) {
 	const mainElementRef = useRef<HTMLElement>();
-	const [imageColumns, setImageColumns] = useState<ImageInfoObj[][]>([
+	const [imageColumns, setImageColumns] = useState<ImageInfoObjLocal[][]>([
 		props.latestImages,
 	]);
 
@@ -49,7 +49,7 @@ export default function Home(props: Props) {
 				"--column-count"
 			)
 		);
-		let imageColumnsTemp = new Array<ImageInfoObj[]>(galleryColumnCount)
+		let imageColumnsTemp = new Array<ImageInfoObjLocal[]>(galleryColumnCount)
 			.fill(null)
 			.map(() => new Array());
 
@@ -121,7 +121,18 @@ export const getStaticProps: GetStaticProps = async () => {
 
 	return {
 		props: {
-			latestImages,
+			latestImages: latestImages.map((imageInfo) => {
+				const downloadUrl = `/api/download-image?filename=${imageInfo.downloadFilename}`;
+				const imageUrl = supabase.imageUrl(imageInfo.downloadFilename);
+
+				return {
+					width: imageInfo.width,
+					height: imageInfo.height,
+					downloadFilename: imageInfo.downloadFilename,
+					downloadUrl,
+					imageUrl,
+				};
+			}) as ImageInfoObjLocal[],
 		},
 	};
 };
