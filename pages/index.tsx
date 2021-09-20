@@ -132,6 +132,7 @@ export default function Home(props: Props) {
 }
 
 export const getStaticProps: GetStaticProps = async () => {
+	const REVALIDATION_TIME = 1 * 60 * 60; // 1 hour
 	const latestImages = await supabase.getAllImages();
 
 	return {
@@ -149,5 +150,6 @@ export const getStaticProps: GetStaticProps = async () => {
 				};
 			}) as ImageInfoObjLocal[],
 		},
+		revalidate: REVALIDATION_TIME,
 	};
 };
