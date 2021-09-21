@@ -38,7 +38,7 @@ export default function Home(props: Props) {
 	const links = [
 		{
 			icon: InstagramIcon,
-			url: "https://instagram.com/je_logaranjan__",
+			url: "https://instagram.com/gallery_of_je",
 		},
 	];
 
