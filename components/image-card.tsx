@@ -26,6 +26,8 @@ export default function ImageCard(props: Props) {
 				className={styles.image}
 				width={props.width}
 				height={props.height}
+				placeholder="blur"
+				blurDataURL={props.thumbnailUrl}
 			/>
 		</div>
 	);

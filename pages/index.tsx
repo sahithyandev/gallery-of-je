@@ -1,5 +1,6 @@
 import { GetStaticProps } from "next";
 import Head from "next/head";
+import sharp from "sharp";
 
 import { ImageCard, Footer } from "../components";
 import { ImageInfoObjLocal } from "../types";
@@ -96,6 +97,7 @@ export default function Home(props: Props) {
 							width={GalleryOfJE.width}
 							height={GalleryOfJE.height}
 							className={styles.profileCard_titleImage}
+							placeholder="blur"
 						/>
 						<p className={styles.profileCard_description}>
 							Retouched photos using Lightroom CC & Photoshop. Reach me out on
@@ -132,23 +134,46 @@ export default function Home(props: Props) {
 }
 
 export const getStaticProps: GetStaticProps = async () => {
+	require("isomorphic-fetch");
 	const REVALIDATION_TIME = 1 * 60 * 60; // 1 hour
+	const THUMBNAIL_QUALITY = 8; //40;
+
 	const latestImages = await supabase.getAllImages();
+
+	const thumbFunc = async (imageUrl: string) => {
+		const imageResponse = await fetch(imageUrl);
+		const imageArrBuffer = await imageResponse.arrayBuffer();
+		const imageBuffer = Buffer.from(imageArrBuffer);
+		const thumb = await sharp(imageBuffer)
+			.resize(THUMBNAIL_QUALITY, undefined)
+			.tint("#000000")
+			.png()
+			.toBuffer();
+
+		const thumbUrl = `data:image/png;base64,${thumb.toString("base64")}`;
+		return thumbUrl;
+	};
+
+	const latestImagesLocal: ImageInfoObjLocal[] = await Promise.all(
+		latestImages.map(async (imageInfo) => {
+			const downloadUrl = `/api/download-image?filename=${imageInfo.downloadFilename}`;
+			const imageUrl = supabase.imageUrl(imageInfo.downloadFilename);
+			const thumbnailUrl = await thumbFunc(imageUrl);
+
+			return {
+				width: imageInfo.width,
+				height: imageInfo.height,
+				downloadFilename: imageInfo.downloadFilename,
+				downloadUrl,
+				imageUrl,
+				thumbnailUrl,
+			} as ImageInfoObjLocal;
+		})
+	);
 
 	return {
 		props: {
-			latestImages: latestImages.map((imageInfo) => {
-				const downloadUrl = `/api/download-image?filename=${imageInfo.downloadFilename}`;
-				const imageUrl = supabase.imageUrl(imageInfo.downloadFilename);
-
-				return {
-					width: imageInfo.width,
-					height: imageInfo.height,
-					downloadFilename: imageInfo.downloadFilename,
-					downloadUrl,
-					imageUrl,
-				};
-			}) as ImageInfoObjLocal[],
+			latestImages: latestImagesLocal,
 		},
 		revalidate: REVALIDATION_TIME,
 	};
