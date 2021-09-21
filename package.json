@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "sync-images": "tsc -p scripts; node scripts/sync-images.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^1.22.6",
@@ -18,6 +19,7 @@
     "@types/node": "^16.9.1",
     "@types/react": "^17.0.21",
     "@types/sharp": "^0.29.2",
+    "dotenv": "^10.0.0",
     "isomorphic-fetch": "^3.0.0",
     "typescript": "^4.4.3"
   }
