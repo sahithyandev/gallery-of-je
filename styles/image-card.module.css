@@ -55,5 +55,12 @@
 		display: block;
 		pointer-events: auto;
 		cursor: pointer;
+
+		bottom: 15px;
+		right: 13px;
+	}
+
+	.downloadIcon {
+		--size: 19px;
 	}
 }

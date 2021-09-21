@@ -73,8 +73,11 @@
 	}
 }
 @media (max-width: 600px) {
+	.homePageContainer {
+		--width: 90vw;
+	}
 	.main {
-		--column-count: 2;
+		--column-count: 3;
 	}
 
 	.profileCard {
@@ -94,12 +97,6 @@
 }
 @media (max-width: 500px) {
 	/* mobile */
-	.homePageContainer {
-		width: 90vw;
-	}
-	.main {
-		--column-count: 1;
-	}
 
 	.imagesContainer {
 		/* --image-card-width: var(--width); */
