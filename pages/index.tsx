@@ -29,6 +29,12 @@ export default function Home(props: Props) {
 		{
 			icon: InstagramIcon,
 			url: "https://instagram.com/gallery_of_je",
+			text: "Gallery Of JE",
+		},
+		{
+			icon: InstagramIcon,
+			url: "https://instagram.com/je_logaranjan",
+			text: "JE Logaranjan",
 		},
 	];
 
@@ -102,7 +108,10 @@ export default function Home(props: Props) {
 							{links.map((link) => {
 								return (
 									<a key={link.url} href={link.url}>
-										<img src={link.icon.src} />
+										<div className={styles.profileCard_socialLinkDiv}>
+											<img src={link.icon.src} />
+											<span>{link.text}</span>
+										</div>
 									</a>
 								);
 							})}

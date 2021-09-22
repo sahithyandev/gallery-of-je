@@ -56,6 +56,14 @@
 
 .profileCard_socialLinks {
 	width: fit-content;
+	display: flex;
+	gap: 18px;
+}
+
+.profileCard_socialLinkDiv {
+	display: flex;
+	align-items: center;
+	gap: 3px;
 }
 
 .profileCard_socialLinks img {
