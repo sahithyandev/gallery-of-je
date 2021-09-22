@@ -144,9 +144,12 @@ export const getStaticProps: GetStaticProps = async () => {
 		const imageResponse = await fetch(imageUrl);
 		const imageArrBuffer = await imageResponse.arrayBuffer();
 		const imageBuffer = Buffer.from(imageArrBuffer);
+
+		const dominantColor = (await sharp(imageBuffer).stats()).dominant;
+
 		const thumb = await sharp(imageBuffer)
 			.resize(THUMBNAIL_QUALITY, undefined)
-			.tint("#000000")
+			.tint(dominantColor)
 			.png()
 			.toBuffer();
 
