@@ -1,6 +1,5 @@
 .container {
-	--normal-width: 360px;
-	width: var(--image-card-width, var(--normal-width));
+	width: 100%;
 	height: fit-content;
 
 	position: relative;

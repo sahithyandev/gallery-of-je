@@ -4,6 +4,7 @@ import sharp from "sharp";
 
 import { ImageCard, Footer } from "../components";
 import { ImageInfoObjLocal } from "../types";
+import { ImageGallery } from "../models/image-gallery";
 
 import JE from "../assets/JE.png";
 import GalleryOfJE from "../assets/gallery-of-je.png";
@@ -17,21 +18,9 @@ interface Props {
 	latestImages: ImageInfoObjLocal[];
 }
 
-const columnHeight = (columnImages: ImageInfoObjLocal[]) => {
-	return columnImages.reduce(
-		(height, currentImage) => height + currentImage.height,
-		0
-	);
-};
-
-const findSmallImageColumn = (column: ImageInfoObjLocal[][]) => {
-	const heights = column.map(columnHeight);
-
-	return column[heights.findIndex((v) => v === Math.min(...heights))];
-};
-
 export default function Home(props: Props) {
-	const mainElementRef = useRef<HTMLElement>();
+	const imageContainerRef = useRef<HTMLDivElement>();
+	const imageGallery = new ImageGallery(props.latestImages);
 	const [imageColumns, setImageColumns] = useState<ImageInfoObjLocal[][]>([
 		props.latestImages,
 	]);
@@ -45,37 +34,43 @@ export default function Home(props: Props) {
 
 	const _columnResize = () => {
 		let oldGalleryColumnCount = 1;
+
 		return () => {
+			const imageContainerStyles = getComputedStyle(imageContainerRef.current);
 			let galleryColumnCount = parseInt(
-				getComputedStyle(mainElementRef.current).getPropertyValue(
-					"--column-count"
-				)
+				imageContainerStyles.getPropertyValue("--column-count")
 			);
+
+			const columnWidth = (() => {
+				const parentWidth = imageContainerRef.current.offsetWidth;
+				// TODO keep an eye on it
+				const columnGap = parseInt(
+					imageContainerStyles.getPropertyValue("--column-gap")
+				);
+
+				return Math.floor(
+					(parentWidth - (galleryColumnCount - 1) * columnGap) /
+						galleryColumnCount
+				);
+			})();
 
 			if (galleryColumnCount === oldGalleryColumnCount) return;
 
-			let imageColumnsTemp = new Array<ImageInfoObjLocal[]>(galleryColumnCount)
-				.fill(null)
-				.map(() => new Array());
-
-			for (const image of props.latestImages) {
-				const parentColumn = findSmallImageColumn(imageColumnsTemp);
-				parentColumn.push(image);
-			}
-
-			oldGalleryColumnCount = galleryColumnCount;
-			setImageColumns(imageColumnsTemp);
+			setImageColumns(
+				imageGallery
+					.createColumns(galleryColumnCount, columnWidth)
+					.map((v) => v.images)
+			);
 		};
 	};
 
 	useEffect(() => {
 		const columnResize = _columnResize();
 		columnResize();
-		console.log("effect");
 		window.addEventListener("resize", () => {
 			columnResize();
 		});
-	}, [mainElementRef]);
+	}, [imageContainerRef]);
 
 	return (
 		<div className={styles.homePageContainer}>
@@ -83,7 +78,7 @@ export default function Home(props: Props) {
 				<title>Gallery Of JE</title>
 			</Head>
 
-			<main className={styles.main} ref={mainElementRef}>
+			<main className={styles.main}>
 				<div className={styles.profileCard}>
 					<img
 						src={JE.src}
@@ -115,7 +110,7 @@ export default function Home(props: Props) {
 					</div>
 				</div>
 
-				<div className={styles.imagesContainer}>
+				<div className={styles.imagesContainer} ref={imageContainerRef}>
 					{imageColumns.map((imageColumn, i) => {
 						return (
 							<div key={i} className={styles.imagesContainer_column}>

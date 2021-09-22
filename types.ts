@@ -13,4 +13,6 @@ export interface ImageInfoObjLocal {
 	thumbnailUrl: string;
 	width: number;
 	height: number;
+	displayWidth?: number;
+	displayHeight?: number;
 }
