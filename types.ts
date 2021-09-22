@@ -3,6 +3,7 @@ export interface ImageInfoObj {
 	width: number;
 	height: number;
 	downloadCount: number;
+	addedOn: Date;
 }
 
 export interface ImageInfoObjLocal {

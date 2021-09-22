@@ -24,7 +24,8 @@ class SupabaseConnection {
 	async getAllImages(): Promise<ImageInfoObj[]> {
 		const { data, error } = await this.client
 			.from<ImageInfoObj>(SupabaseConnection.IMAGE_INFO_COLLECTION)
-			.select();
+			.select()
+			.order("addedOn", { ascending: false });
 
 		if (error) {
 			throw error;

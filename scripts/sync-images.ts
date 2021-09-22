@@ -1,4 +1,4 @@
-import { readdir, rename } from "fs/promises";
+import { readdir, rename, stat } from "fs/promises";
 import { join } from "path";
 
 import sharp from "sharp";
@@ -93,11 +93,13 @@ async function renameFile(imgFilePath: string) {
 			// upload storage
 			const fileName = await supabase.uploadImage(file);
 
+			const lastModTime = (await stat(file)).mtime;
 			const { width, height } = await sharp(file).metadata();
 			return {
 				downloadFilename: fileName,
 				width,
 				height,
+				addedOn: lastModTime,
 			} as ImageInfoObj;
 		})
 	);
