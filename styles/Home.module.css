@@ -78,20 +78,11 @@
 		align-items: center;
 		text-align: center;
 	}
-
-	.profileCard_secondColumn p {
-		/* text-align: center; */
-		/* max-width: 38ch; */
-		/* align-items: center; */
-	}
 }
 @media (max-width: 500px) {
 	/* mobile */
 
 	.imagesContainer {
 		justify-content: center;
-	}
-	.profileCard {
-		flex-direction: column;
 	}
 }
