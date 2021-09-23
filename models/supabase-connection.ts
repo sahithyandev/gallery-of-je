@@ -90,9 +90,21 @@ class SupabaseConnection {
 	}
 
 	async addImageInfo(imageInfoObjArr: ImageInfoObj[]) {
+		const { data: existingImageInfo, error: selectError } = await this.client
+			.from<ImageInfoObj>(SupabaseConnection.IMAGE_INFO_COLLECTION)
+			.select("downloadFilename");
+
+		if (selectError) throw selectError;
+
+		const existingImages = existingImageInfo.map((e) => e.downloadFilename);
+
 		const { data, error } = await this.client
 			.from<ImageInfoObj>(SupabaseConnection.IMAGE_INFO_COLLECTION)
-			.upsert(imageInfoObjArr);
+			.upsert(
+				imageInfoObjArr.filter((imageInfo) => {
+					return !existingImages.includes(imageInfo.downloadFilename);
+				})
+			);
 
 		if (error) throw error;
 

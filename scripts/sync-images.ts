@@ -56,7 +56,7 @@ async function renameFile(imgFilePath: string) {
 }
 
 (async () => {
-	let imageFiles;
+	let imageFiles: string[];
 
 	try {
 		imageFiles = await readdir(IMAGES_DIR);
