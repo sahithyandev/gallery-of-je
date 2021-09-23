@@ -9,6 +9,7 @@ class SupabaseConnection {
 	static IMAGE_INFO_COLLECTION = "imageInfo";
 	static PUBLIC_IMAGE_STORAGE =
 		"https://erwfxmftkzktexefxtdy.supabase.in/storage/v1/object/public/images";
+	static IMAGE_CACHE_CONTROL_TIME = (3 * 60 * 60).toString();
 
 	constructor() {
 		const SUPABASE_URL = process.env.SUPABASE_URL || "";
@@ -79,6 +80,7 @@ class SupabaseConnection {
 			.from("images")
 			.upload(filename, fileContent, {
 				contentType: fileMimeType,
+				cacheControl: SupabaseConnection.IMAGE_CACHE_CONTROL_TIME,
 			});
 
 		if (error) throw error;
