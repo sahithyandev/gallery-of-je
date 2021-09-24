@@ -7,6 +7,12 @@ import styles from "../styles/image-card.module.css";
 
 type Props = ImageInfoObjLocal;
 
+const imgixLoader = ({ src, width, quality }): string => {
+	return `https://gallery-of-je.imgix.net/${src}?w=${width}&fit=clip&q=${
+		quality || 75
+	}`;
+};
+
 export default function ImageCard(props: Props) {
 	return (
 		<div className={styles.container}>
@@ -22,12 +28,14 @@ export default function ImageCard(props: Props) {
 			</div>
 
 			<Image
-				src={props.imageUrl}
+				loader={imgixLoader}
+				src={props.downloadFilename}
 				className={styles.image}
 				width={props.width}
 				height={props.height}
 				placeholder="blur"
 				blurDataURL={props.thumbnailUrl}
+				layout="responsive"
 			/>
 		</div>
 	);
