@@ -1,10 +1,28 @@
-.homePageContainer {
+.main {
 	max-width: 92vw;
 	margin: 0 auto;
 }
 
-.main {
-	margin: 0 auto;
+@keyframes bannerDropin {
+	from {
+		transform: translateY(-100%);
+	}
+	to {
+		transform: translateY(0);
+	}
+}
+
+.creatorBanner {
+	text-align: center;
+	padding: 5px 0;
+	background: hsl(219deg 100% 6%);
+	color: hsl(219deg 100% 95%);
+	animation: bannerDropin 0.3s ease-in-out 10s;
+}
+
+.creatorBanner a {
+	color: hsl(235deg 100% 84%);
+	text-decoration: underline;
 }
 
 .imagesContainer {

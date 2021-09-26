@@ -85,6 +85,13 @@ export default function Home(props: Props) {
 				<title>Gallery Of JE</title>
 			</Head>
 
+			<div className={styles.creatorBanner}>
+				Made by{" "}
+				<a href="https://sahithyandev.github.io" target="_blank">
+					Sahithyan
+				</a>
+			</div>
+
 			<main className={styles.main}>
 				<div className={styles.profileCard}>
 					<img
