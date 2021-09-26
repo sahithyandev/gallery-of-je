@@ -17,7 +17,9 @@
 	padding: 5px 0;
 	background: hsl(219deg 100% 6%);
 	color: hsl(219deg 100% 95%);
-	animation: bannerDropin 0.3s ease-in-out 10s;
+	transform: translateY(-100%);
+	animation: bannerDropin 0.3s ease-in-out 8s;
+	animation-fill-mode: forwards;
 }
 
 .creatorBanner a {
