@@ -23,24 +23,26 @@
 }
 
 .profileCard {
+	display: grid;
 	width: fit-content;
 	margin: 60px auto 50px;
-	display: flex;
-	flex-direction: row;
-	gap: 20px;
+	gap: 10px 20px;
+	grid-template-columns: repeat(4, auto);
+	grid-template-rows: repeat(3, auto);
+	grid-template-areas:
+		"image title title title"
+		"image description description description"
+		"image total-downloads . social-links";
 }
 
 .profileCard_image {
+	grid-area: image;
 	width: 128px;
 	height: fit-content;
 }
 
-.profileCard_secondColumn {
-	display: flex;
-	flex-direction: column;
-}
-
-.profileCard_secondColumn p {
+.profileCard p {
+	grid-area: description;
 	margin: 0;
 	font-size: 1.05em;
 	margin-bottom: 10px;
@@ -48,13 +50,20 @@
 }
 
 .profileCard_titleImage {
-	margin-bottom: 10px;
+	grid-area: title;
 	margin-top: 12px;
 	height: 60px;
 	width: fit-content;
 }
 
+.profileCard_totalDownloads {
+	grid-area: total-downloads;
+	/* background: red; */
+}
+
 .profileCard_socialLinks {
+	grid-area: social-links;
+	font-size: 0.88rem;
 	width: fit-content;
 	display: flex;
 	gap: 18px;
@@ -67,7 +76,7 @@
 }
 
 .profileCard_socialLinks img {
-	width: 28px;
+	width: 24px;
 	height: auto;
 }
 
@@ -79,15 +88,32 @@
 }
 @media (max-width: 600px) {
 	.profileCard {
-		flex-direction: column;
-		align-items: center;
+		grid-template-columns: repeat(3, auto);
+		grid-template-rows: repeat(4, auto);
+		grid-template-areas:
+			"image image image"
+			"title title title"
+			"description description description"
+			"total-downloads social-links social-links";
+		justify-items: center;
+		gap: 5px 10px;
 	}
-	.profileCard_secondColumn {
-		align-items: center;
-		text-align: center;
+	.profileCard_socialLinks {
+		gap: 9px;
+	}
+	.profileCard_socialLinkDiv {
+		gap: 2px;
 	}
 }
 @media (max-width: 500px) {
 	/* mobile */
-
+	.profileCard_totalDownloads {
+		font-size: 0.9rem;
+	}
+	.profileCard_socialLinks {
+		font-size: 0.88rem;
+	}
+	.profileCard_socialLinks img {
+		width: 20px;
+	}
 }

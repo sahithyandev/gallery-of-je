@@ -35,6 +35,13 @@ class SupabaseConnection {
 		return data;
 	}
 
+	async totalDownloadCount(): Promise<number> {
+		const { data, error } = await this.client.rpc("total_download_count");
+
+		if (error) throw error;
+		return data as unknown as number; // totalDownloadCount
+	}
+
 	imageUrl(downloadFilename: string) {
 		return `${SupabaseConnection.PUBLIC_IMAGE_STORAGE}/${downloadFilename}`;
 	}

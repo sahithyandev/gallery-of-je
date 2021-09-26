@@ -16,6 +16,7 @@ import supabase from "../models/supabase-connection";
 
 interface Props {
 	latestImages: ImageInfoObjLocal[];
+	totalDownloadCount: number;
 }
 
 export default function Home(props: Props) {
@@ -92,30 +93,31 @@ export default function Home(props: Props) {
 						height={JE.height}
 						className={styles.profileCard_image}
 					/>
-					<div className={styles.profileCard_secondColumn}>
-						<img
-							src={GalleryOfJE.src}
-							width={GalleryOfJE.width}
-							height={GalleryOfJE.height}
-							className={styles.profileCard_titleImage}
-							placeholder="blur"
-						/>
-						<p className={styles.profileCard_description}>
-							Retouched photos using Lightroom CC & Photoshop. Reach me out on
-							Instagram for the Presets Dngs used in these images.
-						</p>
-						<div className={styles.profileCard_socialLinks}>
-							{links.map((link) => {
-								return (
-									<a key={link.url} href={link.url}>
-										<div className={styles.profileCard_socialLinkDiv}>
-											<img src={link.icon.src} />
-											<span>{link.text}</span>
-										</div>
-									</a>
-								);
-							})}
-						</div>
+					<img
+						src={GalleryOfJE.src}
+						width={GalleryOfJE.width}
+						height={GalleryOfJE.height}
+						className={styles.profileCard_titleImage}
+						placeholder="blur"
+					/>
+					<p className={styles.profileCard_description}>
+						Retouched photos using Lightroom CC & Photoshop. Reach me out on
+						Instagram for the Presets Dngs used in these images.
+					</p>
+					<div className={styles.profileCard_totalDownloads}>
+						{props.totalDownloadCount} downloads
+					</div>
+					<div className={styles.profileCard_socialLinks}>
+						{links.map((link) => {
+							return (
+								<a key={link.url} href={link.url}>
+									<div className={styles.profileCard_socialLinkDiv}>
+										<img src={link.icon.src} />
+										<span>{link.text}</span>
+									</div>
+								</a>
+							);
+						})}
 					</div>
 				</div>
 
@@ -137,7 +139,7 @@ export default function Home(props: Props) {
 	);
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getStaticProps: GetStaticProps<Props> = async () => {
 	require("isomorphic-fetch");
 	const REVALIDATION_TIME = 1 * 60 * 60; // 1 hour
 	const THUMBNAIL_QUALITY = 8; //40;
@@ -178,9 +180,12 @@ export const getStaticProps: GetStaticProps = async () => {
 		})
 	);
 
+	const totalDownloadCount = await supabase.totalDownloadCount();
+
 	return {
 		props: {
 			latestImages: latestImagesLocal,
+			totalDownloadCount,
 		},
 		revalidate: REVALIDATION_TIME,
 	};
