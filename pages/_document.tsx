@@ -5,6 +5,10 @@ export default class MyDocument extends Document {
 		return (
 			<Html>
 				<Head>
+					<meta
+						name="description"
+						content="Retouched photos using Lightroom CC & Photoshop by Janoshan (JE)"
+					/>
 					<link rel="preconnect" href="https://fonts.googleapis.com" />
 					<link
 						rel="preconnect"
@@ -40,6 +44,16 @@ export default class MyDocument extends Document {
 						async
 						defer
 					></script>
+
+					{/* OG tags */}
+					<meta property="og:title" content="Gallery Of JE" />
+					<meta property="og:type" content="website" />
+					<meta property="og:url" content="https://gallery-of-je.vercel.app" />
+					{/*
+					<meta
+						property="og:image"
+						content="https://ia.media-imdb.com/images/rock.jpg"
+					/>*/}
 				</Head>
 				<body>
 					<Main />
