@@ -5,6 +5,7 @@ import { ImageInfoObjLocal } from "../types";
 import downloadIcon from "../assets/icons/tabler-icon-download.svg";
 import styles from "../styles/image-card.module.css";
 
+declare const pa;
 type Props = ImageInfoObjLocal;
 
 const imgixLoader = ({ src, width, quality }): string => {
@@ -14,10 +15,18 @@ const imgixLoader = ({ src, width, quality }): string => {
 };
 
 export default function ImageCard(props: Props) {
+	const down = () => {
+		pa.track({ name: "Image Download", value: props.downloadFilename });
+	};
+
 	return (
 		<div className={styles.container}>
 			<div className={styles.downloadIconContainer}>
-				<a download={props.downloadFilename} href={props.downloadUrl}>
+				<a
+					onClick={() => down()}
+					download={props.downloadFilename}
+					href={props.downloadUrl}
+				>
 					<img
 						className={styles.downloadIcon}
 						src={downloadIcon.src}
