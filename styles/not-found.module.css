@@ -4,3 +4,12 @@
 	align-items: center;
 	justify-content: center;
 }
+
+.main {
+	text-align: center;
+	font-size: 1.2em;
+}
+
+.title {
+	font-size: 2rem;
+}

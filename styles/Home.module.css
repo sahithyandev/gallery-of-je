@@ -24,7 +24,6 @@
 
 .creatorBanner a {
 	color: hsl(235deg 100% 84%);
-	text-decoration: underline;
 }
 
 .imagesContainer {
@@ -90,7 +89,6 @@
 }
 
 .profileCard_socialLinks a {
-	text-decoration: underline;
 	font-weight: 500;
 }
 
