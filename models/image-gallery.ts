@@ -1,20 +1,18 @@
-import { ImageCategory, ImageCategoryLocal, ImageInfoObjLocal } from "../types";
+import { ImageCategoryLocal, ImageInfoObjLocal } from "../types";
 import { ImageGalleryColumn } from "./image-gallery-column";
 
 export class ImageGallery {
 	private items: ImageInfoObjLocal[];
 	private itemsToShow: ImageInfoObjLocal[];
-	private categoryToShow: ImageCategoryLocal;
 
 	constructor(items?: ImageInfoObjLocal[]) {
 		this.items = [];
 		this.itemsToShow = [];
-		this.categoryToShow = "all";
 
 		items.forEach((item) => {
 			this.add(item);
 		});
-		this.setCategory("all");
+		this.filterCategory("all");
 	}
 
 	add(item: ImageInfoObjLocal) {
