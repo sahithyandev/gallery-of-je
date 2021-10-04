@@ -4,7 +4,7 @@ import { join } from "path";
 import sharp from "sharp";
 
 import supabase from "../models/supabase-connection";
-import { ImageInfoObj } from "../types";
+import { ImageCategory, ImageInfoObj } from "../types";
 
 const IMAGES_DIR = join(__dirname, "./../images");
 const CHARACTERS = {
@@ -55,11 +55,22 @@ async function renameFile(imgFilePath: string) {
 	return newImgFilePath;
 }
 
+interface ImageFileObj {
+	name: string;
+	category: ImageCategory;
+}
+
 (async () => {
-	let imageFiles: string[];
+	let imageFiles: ImageFileObj[] = [];
+	let imageCategoryFolders: ImageCategory[] = [];
 
 	try {
-		imageFiles = await readdir(IMAGES_DIR);
+		imageCategoryFolders = (await readdir(IMAGES_DIR)) as ImageCategory[];
+		console.log(
+			`Found ${
+				imageCategoryFolders.length
+			} categories (${imageCategoryFolders.join(", ")})`
+		);
 	} catch (err) {
 		console.log(err);
 		console.log(
@@ -67,29 +78,51 @@ async function renameFile(imgFilePath: string) {
 		);
 	}
 
-	//TODO add some error checking here
-	// 1. filter the images
+	// get all images
+	for (const category of imageCategoryFolders) {
+		try {
+			const images = await readdir(join(IMAGES_DIR, category));
+			images.forEach((image) => {
+				imageFiles.push({ name: image, category });
+			});
+
+			console.log(`Found ${imageFiles.length} images under ${category}`);
+		} catch (err) {
+			console.log(err);
+			console.log(
+				`Seems like you don't have the IMAGES_DIR (${IMAGES_DIR}) setup`
+			);
+		}
+	}
+
 	console.log(`Found ${imageFiles.length} images`);
 
 	// validate names
-	const validatedImgFiles = [];
-	for (const imgFile of imageFiles) {
+	const validatedImgFiles: ImageFileObj[] = [];
+	for (const imgFileObj of imageFiles) {
 		const IMG_FILENAME_PATTERN = /JE-(?<fileId>\w{6})\.\w+/;
+		const imgFile = imgFileObj.name;
+		const fullFilePath = join(IMAGES_DIR, imgFileObj.category, imgFile);
 
 		if (!IMG_FILENAME_PATTERN.test(imgFile)) {
-			const newImgFileName = await renameFile(join(IMAGES_DIR, imgFile));
-			validatedImgFiles.push(newImgFileName);
+			const newImgFileName = await renameFile(fullFilePath);
+
+			validatedImgFiles.push({ ...imgFileObj, name: newImgFileName });
 		} else {
 			const fileId = imgFile.match(IMG_FILENAME_PATTERN).groups.fileId;
 
 			alreadyUsedFileIds.push(fileId);
-			validatedImgFiles.push(join(IMAGES_DIR, imgFile));
+			validatedImgFiles.push({
+				...imgFileObj,
+				name: fullFilePath,
+			});
 		}
 	}
 
 	// upload images to storage
 	const imageInfoArr: ImageInfoObj[] = await Promise.all(
-		validatedImgFiles.map(async (file) => {
+		validatedImgFiles.map(async (fileObj) => {
+			const file = fileObj.name;
 			// upload storage
 			const fileName = await supabase.uploadImage(file);
 
@@ -100,6 +133,7 @@ async function renameFile(imgFilePath: string) {
 				width,
 				height,
 				addedOn: lastModTime,
+				category: fileObj.category,
 			} as ImageInfoObj;
 		})
 	);

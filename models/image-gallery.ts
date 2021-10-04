@@ -1,17 +1,34 @@
-import { ImageInfoObjLocal } from "../types";
+import { ImageCategory, ImageCategoryLocal, ImageInfoObjLocal } from "../types";
 import { ImageGalleryColumn } from "./image-gallery-column";
 
 export class ImageGallery {
 	private items: ImageInfoObjLocal[];
+	private itemsToShow: ImageInfoObjLocal[];
+	private categoryToShow: ImageCategoryLocal;
 
 	constructor(items?: ImageInfoObjLocal[]) {
 		this.items = [];
+		this.itemsToShow = [];
+		this.categoryToShow = "all";
 
-		items.forEach((item) => this.add(item));
+		items.forEach((item) => {
+			this.add(item);
+		});
+		this.setCategory("all");
 	}
 
 	add(item: ImageInfoObjLocal) {
 		this.items.push(item);
+	}
+
+	filterCategory(category: ImageCategoryLocal) {
+		this.itemsToShow = this.items.filter((item) => {
+			if (category === "all") return true;
+
+			return item.category === category;
+		});
+
+		return this;
 	}
 
 	createColumns(columnCount: number, columnSize: number): ImageGalleryColumn[] {
@@ -20,8 +37,7 @@ export class ImageGallery {
 			.map(() => new ImageGalleryColumn());
 
 		let smallestColumnIndex = 0;
-
-		for (const item of this.items) {
+		for (const item of this.itemsToShow) {
 			const smallestColumn = columns[smallestColumnIndex];
 
 			smallestColumn.add({

@@ -3,7 +3,11 @@ import Head from "next/head";
 import sharp from "sharp";
 
 import { ImageCard, Footer } from "../components";
-import { ImageInfoObjLocal } from "../types";
+import {
+	ImageInfoObjLocal,
+	ImageCategoryLocalValues,
+	ImageCategoryLocal,
+} from "../types";
 import { ImageGallery } from "../models/image-gallery";
 
 import JE from "../assets/JE.png";
@@ -19,12 +23,40 @@ interface Props {
 	totalDownloadCount: number;
 }
 
+function capitalize(word: string): string {
+	return word.charAt(0).toUpperCase().concat(word.slice(1));
+}
+
+function formatCategoryName(category: string): string {
+	const SPECIAL_WORDS = ["tv"];
+
+	return category
+		.split("-")
+		.map((word) => {
+			if (SPECIAL_WORDS.includes(word)) return word.toUpperCase();
+
+			return capitalize(word);
+		})
+		.join(" ");
+}
+
+interface ImageGalleryOptionsObj {
+	columnCount: number;
+	columnWidth: number;
+	category: ImageCategoryLocal;
+}
+
 export default function Home(props: Props) {
 	const imageContainerRef = useRef<HTMLDivElement>();
+
 	const imageGallery = new ImageGallery(props.latestImages);
-	const [imageColumns, setImageColumns] = useState<ImageInfoObjLocal[][]>([
-		props.latestImages,
-	]);
+
+	const [imageGalleryOptions, setImageGalleryOptions] =
+		useState<ImageGalleryOptionsObj>({
+			columnCount: 1,
+			columnWidth: 200,
+			category: "all",
+		});
 
 	const links = [
 		{
@@ -63,12 +95,16 @@ export default function Home(props: Props) {
 
 			if (galleryColumnCount === oldGalleryColumnCount) return;
 
-			setImageColumns(
-				imageGallery
-					.createColumns(galleryColumnCount, columnWidth)
-					.map((v) => v.images)
-			);
+			setImageGalleryOptions({
+				...imageGalleryOptions,
+				columnWidth,
+				columnCount: galleryColumnCount,
+			});
 		};
+	};
+
+	const updateSelectedCategory = (category: ImageCategoryLocal) => {
+		setImageGalleryOptions({ ...imageGalleryOptions, category });
 	};
 
 	useEffect(() => {
@@ -128,16 +164,41 @@ export default function Home(props: Props) {
 					</div>
 				</div>
 
-				<div className={styles.imagesContainer} ref={imageContainerRef}>
-					{imageColumns.map((imageColumn, i) => {
+				{/* TODO show the category selector here */}
+				<div className={styles.categorySelector}>
+					{ImageCategoryLocalValues.map((category, i) => {
 						return (
-							<div key={i} className={styles.imagesContainer_column}>
-								{imageColumn.map((image) => {
-									return <ImageCard {...image} key={image.downloadUrl} />;
-								})}
-							</div>
+							<span
+								key={i}
+								onClick={() =>
+									updateSelectedCategory(category as ImageCategoryLocal)
+								}
+								className={styles.categorySelector_item}
+								data-selected={category === imageGalleryOptions.category}
+							>
+								{formatCategoryName(category)}
+							</span>
 						);
 					})}
+				</div>
+
+				<div className={styles.imagesContainer} ref={imageContainerRef}>
+					{imageGallery
+						.filterCategory(imageGalleryOptions.category)
+						.createColumns(
+							imageGalleryOptions.columnCount,
+							imageGalleryOptions.columnWidth
+						)
+						.map((imageColumn) => imageColumn.images)
+						.map((imageColumnItems, i) => {
+							return (
+								<div key={i} className={styles.imagesContainer_column}>
+									{imageColumnItems.map((image) => {
+										return <ImageCard {...image} key={image.downloadUrl} />;
+									})}
+								</div>
+							);
+						})}
 				</div>
 			</main>
 
@@ -180,6 +241,7 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
 				width: imageInfo.width,
 				height: imageInfo.height,
 				downloadFilename: imageInfo.downloadFilename,
+				category: imageInfo.category,
 				downloadUrl,
 				imageUrl,
 				thumbnailUrl,
