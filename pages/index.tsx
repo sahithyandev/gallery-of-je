@@ -94,6 +94,7 @@ export default function Home(props: Props) {
 			})();
 
 			if (galleryColumnCount === oldGalleryColumnCount) return;
+			oldGalleryColumnCount = galleryColumnCount;
 
 			setImageGalleryOptions({
 				...imageGalleryOptions,
@@ -110,9 +111,13 @@ export default function Home(props: Props) {
 	useEffect(() => {
 		const columnResize = _columnResize();
 		columnResize();
-		window.addEventListener("resize", () => {
-			columnResize();
-		});
+		window.addEventListener(
+			"resize",
+			() => {
+				columnResize();
+			},
+			true
+		);
 	}, [imageContainerRef]);
 
 	return (
