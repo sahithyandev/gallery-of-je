@@ -1,8 +1,8 @@
 # Gallery Of JE
 
-This project is a free project I did for one of my classmates using [Next.js](https://nextjs.org/).
+A website full of high-quality retouched photos by Janoshan, one of my friends. Created using [Next.js](https://nextjs.org/).
 
-The website is available at https://gallery-of-je.vercel.app
+The website is available at https://gallery-of-je.vercel.app.
 
 ## Development
 
