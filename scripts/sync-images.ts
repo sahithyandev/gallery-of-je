@@ -47,7 +47,8 @@ async function renameFile(imgFilePath: string) {
 	alreadyUsedFileIds.push(fileId);
 
 	const fileExtension = imgFilePath.split(".").reverse()[0];
-	const newImgFilePath = join(IMAGES_DIR, `JE-${fileId}.${fileExtension}`);
+	const imgFolderPath = imgFilePath.split("/").slice(0, -1).join("/");
+	const newImgFilePath = join(imgFolderPath, `JE-${fileId}.${fileExtension}`);
 
 	console.log("renaming", imgFilePath, "--->", newImgFilePath);
 
