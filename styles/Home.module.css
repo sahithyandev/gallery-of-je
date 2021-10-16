@@ -122,6 +122,27 @@
 	height: auto;
 }
 
+@media (min-width: 1200px) {
+	/* a little big screen */
+	.imagesContainer {
+		--column-count: 5;
+	}
+}
+
+@media (min-width: 1400px) {
+	/* wide screen */
+	.imagesContainer {
+		--column-count: 6;
+	}
+}
+
+@media (min-width: 2000px) {
+	/* very big screen (like a tv) */
+	.imagesContainer {
+		--column-count: 7;
+	}
+}
+
 @media (max-width: 700px) {
 	/* tab */
 	.imagesContainer {
