@@ -98,6 +98,7 @@ interface ImageFileObj {
 
 	console.log(`Found ${imageFiles.length} images`);
 
+	const newImages = [];
 	// validate names
 	const validatedImgFiles: ImageFileObj[] = [];
 	for (const imgFileObj of imageFiles) {
@@ -108,6 +109,7 @@ interface ImageFileObj {
 		if (!IMG_FILENAME_PATTERN.test(imgFile)) {
 			const newImgFileName = await renameFile(fullFilePath);
 
+			newImages.push(imgFile);
 			validatedImgFiles.push({ ...imgFileObj, name: newImgFileName });
 		} else {
 			const fileId = imgFile.match(IMG_FILENAME_PATTERN).groups.fileId;
@@ -141,4 +143,10 @@ interface ImageFileObj {
 
 	// add to database
 	await supabase.addImageInfo(imageInfoArr);
+
+	// vercel deploy
+	require("isomorphic-fetch");
+	if (newImages.length > 0) {
+		fetch(process.env.IMAGES_ADDED_DEPLOY_HOOK);
+	}
 })();
