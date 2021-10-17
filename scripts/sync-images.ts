@@ -82,7 +82,11 @@ interface ImageFileObj {
 	// get all images
 	for (const category of imageCategoryFolders) {
 		try {
-			const images = await readdir(join(IMAGES_DIR, category));
+			const files = await readdir(join(IMAGES_DIR, category));
+			const images = files.filter((fileName) => {
+				// test if its a image
+				return /\.(jpe?g|png)$/i.test(fileName);
+			});
 			images.forEach((image) => {
 				imageFiles.push({ name: image, category });
 			});
