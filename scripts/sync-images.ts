@@ -91,7 +91,7 @@ interface ImageFileObj {
 				imageFiles.push({ name: image, category });
 			});
 
-			console.log(`Found ${imageFiles.length} images under ${category}`);
+			console.log(`Found ${images.length} images under ${category}`);
 		} catch (err) {
 			console.log(err);
 			console.log(
