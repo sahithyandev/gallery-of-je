@@ -41,6 +41,11 @@
 	cursor: pointer;
 }
 
+.categorySelector_item:hover {
+	opacity: 0.7;
+	text-decoration: underline dashed 3px;
+}
+
 .categorySelector_item[data-selected="true"] {
 	opacity: 1;
 }
