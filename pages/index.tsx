@@ -127,10 +127,11 @@ export default function Home(props: Props) {
 			</Head>
 
 			<div className={styles.creatorBanner}>
-				Made by{" "}
+				Made by ❤
 				<a href="https://sahithyandev.github.io" target="_blank">
 					Sahithyan
 				</a>
+				❤
 			</div>
 
 			<main className={styles.main}>
