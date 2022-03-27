@@ -65,11 +65,16 @@ class SupabaseConnection {
 
 		if (error) throw error;
 
-		return data
+		const HAS_ALREADY_UPLOADED = data
 			.map((fileOnCloud) => {
 				return fileOnCloud.name;
 			})
 			.includes(filename);
+
+		if (HAS_ALREADY_UPLOADED)
+			console.log(`IMAGE ALREADY UPLOADED`, imgFilePath);
+
+		return HAS_ALREADY_UPLOADED;
 	}
 
 	async uploadImage(imageFilePath: string): Promise<string> {
@@ -93,7 +98,7 @@ class SupabaseConnection {
 
 		if (error) throw error;
 
-		console.log("uploaded-image", filename);
+		console.log("UPLOADED", filename);
 		return filename;
 	}
 

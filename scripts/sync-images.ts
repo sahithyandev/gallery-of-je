@@ -6,6 +6,12 @@ import sharp from "sharp";
 import supabase from "../models/supabase-connection";
 import { ImageCategory, ImageInfoObj } from "../types";
 
+const CMD_OPTIONS = {
+	NO_RENAME: "--no-rename",
+	NO_UPLOAD: "--no-upload",
+	NO_VERCEL_DEPLOY: "--no-vercel-deploy",
+};
+
 const IMAGES_DIR = join(__dirname, "./../images");
 const CHARACTERS = {
 	alphabets: "abcdefghijklmnopqrstuvwxyz",
@@ -38,7 +44,7 @@ function randomString(
 
 let alreadyUsedFileIds = [];
 
-async function renameFile(imgFilePath: string) {
+async function renameFile(imgFilePath: string, NO_UPLOAD: boolean) {
 	const fileId = randomString(
 		6,
 		CHARACTERS.numbers + CHARACTERS.alphabets,
@@ -52,7 +58,10 @@ async function renameFile(imgFilePath: string) {
 
 	console.log("renaming", imgFilePath, "--->", newImgFilePath);
 
-	await rename(imgFilePath, newImgFilePath);
+	if (!NO_UPLOAD) {
+		await rename(imgFilePath, newImgFilePath);
+	}
+
 	return newImgFilePath;
 }
 
@@ -62,6 +71,32 @@ interface ImageFileObj {
 }
 
 (async () => {
+	const cmdParams = process.argv.slice(2);
+	const NO_RENAME = cmdParams.includes(CMD_OPTIONS.NO_RENAME);
+	const NO_UPLOAD = cmdParams.includes(CMD_OPTIONS.NO_UPLOAD);
+	const NO_VERCEL_DEPLOY = cmdParams.includes(CMD_OPTIONS.NO_VERCEL_DEPLOY);
+
+	if (NO_RENAME) {
+		console.warn(
+			"INFO",
+			`${CMD_OPTIONS.NO_RENAME} has been passed. This will keep the script from renaming any files.`
+		);
+	}
+
+	if (NO_UPLOAD) {
+		console.warn(
+			"INFO",
+			`${CMD_OPTIONS.NO_UPLOAD} has been passed. This will keep the script from uploading any files to the server.`
+		);
+	}
+
+	if (NO_VERCEL_DEPLOY) {
+		console.warn(
+			"INFO",
+			`${CMD_OPTIONS.NO_VERCEL_DEPLOY} has been passed. This will keep the script from calling the Vercel deploy hook.`
+		);
+	}
+
 	let imageFiles: ImageFileObj[] = [];
 	let imageCategoryFolders: ImageCategory[] = [];
 
@@ -111,7 +146,7 @@ interface ImageFileObj {
 		const fullFilePath = join(IMAGES_DIR, imgFileObj.category, imgFile);
 
 		if (!IMG_FILENAME_PATTERN.test(imgFile)) {
-			const newImgFileName = await renameFile(fullFilePath);
+			const newImgFileName = await renameFile(fullFilePath, NO_RENAME);
 
 			newImages.push(imgFile);
 			validatedImgFiles.push({ ...imgFileObj, name: newImgFileName });
@@ -127,30 +162,34 @@ interface ImageFileObj {
 	}
 
 	// upload images to storage
-	const imageInfoArr: ImageInfoObj[] = await Promise.all(
-		validatedImgFiles.map(async (fileObj) => {
-			const file = fileObj.name;
-			// upload storage
-			const fileName = await supabase.uploadImage(file);
+	if (!NO_UPLOAD) {
+		const imageInfoArr: ImageInfoObj[] = await Promise.all(
+			validatedImgFiles.map(async (fileObj) => {
+				const file = fileObj.name;
+				// upload storage
+				const fileName = await supabase.uploadImage(file);
 
-			const lastModTime = (await stat(file)).mtime;
-			const { width, height } = await sharp(file).metadata();
-			return {
-				downloadFilename: fileName,
-				width,
-				height,
-				addedOn: lastModTime,
-				category: fileObj.category,
-			} as ImageInfoObj;
-		})
-	);
+				const lastModTime = (await stat(file)).mtime;
+				const { width, height } = await sharp(file).metadata();
+				return {
+					downloadFilename: fileName,
+					width,
+					height,
+					addedOn: lastModTime,
+					category: fileObj.category,
+				} as ImageInfoObj;
+			})
+		);
 
-	// add to database
-	await supabase.addImageInfo(imageInfoArr);
+		// add to database
+		await supabase.addImageInfo(imageInfoArr);
 
-	// vercel deploy
-	require("isomorphic-fetch");
-	if (newImages.length > 0) {
-		fetch(process.env.IMAGES_ADDED_DEPLOY_HOOK);
+		// vercel deploy
+		if (!NO_VERCEL_DEPLOY) {
+			require("isomorphic-fetch");
+			if (newImages.length > 0) {
+				fetch(process.env.IMAGES_ADDED_DEPLOY_HOOK);
+			}
+		}
 	}
 })();
