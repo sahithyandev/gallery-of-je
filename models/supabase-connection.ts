@@ -1,6 +1,7 @@
 import { readFile } from "fs/promises";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { ImageInfoObj } from "../types";
+import { sep, extname } from "path";
 
 require("dotenv").config();
 
@@ -55,7 +56,7 @@ class SupabaseConnection {
 	}
 
 	async hasImageAlreadyUploaded(imgFilePath: string): Promise<boolean> {
-		const filename = imgFilePath.split("/").reverse()[0];
+		const filename = imgFilePath.split(sep).reverse()[0];
 		const { data, error } = await this.client.storage
 			.from("images")
 			.list(null, {
@@ -72,11 +73,11 @@ class SupabaseConnection {
 	}
 
 	async uploadImage(imageFilePath: string): Promise<string> {
-		const filename = imageFilePath.split("/").reverse()[0];
+		const filename = imageFilePath.split(sep).reverse()[0];
 
 		if (await this.hasImageAlreadyUploaded(imageFilePath)) return filename;
 
-		const fileExtension = filename.split(".").reverse()[0];
+		const fileExtension = extname(filename).replace(".", "");
 		const fileMimeType = (() => {
 			if (fileExtension.match(/jpe?g/)) return "image/jpeg";
 			return `image/${fileExtension}`;

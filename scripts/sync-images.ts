@@ -1,5 +1,5 @@
 import { readdir, rename, stat } from "fs/promises";
-import { join } from "path";
+import { join, extname, sep } from "path";
 
 import sharp from "sharp";
 
@@ -46,9 +46,9 @@ async function renameFile(imgFilePath: string) {
 	);
 	alreadyUsedFileIds.push(fileId);
 
-	const fileExtension = imgFilePath.split(".").reverse()[0];
-	const imgFolderPath = imgFilePath.split("/").slice(0, -1).join("/");
-	const newImgFilePath = join(imgFolderPath, `JE-${fileId}.${fileExtension}`);
+	const fileExtension = extname(imgFilePath);
+	const imgFolderPath = imgFilePath.split(sep).slice(0, -1).join(sep);
+	const newImgFilePath = join(imgFolderPath, `JE-${fileId}${fileExtension}`);
 
 	console.log("renaming", imgFilePath, "--->", newImgFilePath);
 
