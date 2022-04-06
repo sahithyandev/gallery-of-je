@@ -8,6 +8,7 @@ require("dotenv").config();
 class SupabaseConnection {
 	private client: SupabaseClient;
 	static IMAGE_INFO_COLLECTION = "imageInfo";
+	static IMAGES_STORAGE_NAME = "images";
 	static PUBLIC_IMAGE_STORAGE =
 		"https://erwfxmftkzktexefxtdy.supabase.in/storage/v1/object/public/images";
 	static IMAGE_CACHE_CONTROL_TIME = (3 * 60 * 60).toString();
@@ -58,9 +59,9 @@ class SupabaseConnection {
 	async hasImageAlreadyUploaded(imgFilePath: string): Promise<boolean> {
 		const filename = imgFilePath.split(sep).reverse()[0];
 		const { data, error } = await this.client.storage
-			.from("images")
+			.from(SupabaseConnection.IMAGES_STORAGE_NAME)
 			.list(null, {
-				limit: 100,
+				limit: 120,
 			});
 
 		if (error) throw error;
@@ -90,7 +91,7 @@ class SupabaseConnection {
 
 		const fileContent = await readFile(imageFilePath);
 		const { error } = await this.client.storage
-			.from("images")
+			.from(SupabaseConnection.IMAGES_STORAGE_NAME)
 			.upload(filename, fileContent, {
 				contentType: fileMimeType,
 				cacheControl: SupabaseConnection.IMAGE_CACHE_CONTROL_TIME,
