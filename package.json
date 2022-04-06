@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "sync-images": "tsc -p ./scripts/ && node scripts/sync-images.js"
+    "sync-images": "tsc -p ./scripts/ && node scripts/sync-images.js",
+    "validate-images": "tsc -p ./scripts/ && node scripts/validate-images.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^1.22.6",

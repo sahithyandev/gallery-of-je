@@ -126,6 +126,19 @@ class SupabaseConnection {
 
 		return data;
 	}
+
+	// TODO make it recursively load all images from the bucket instead of using a higher limit
+	async getAllImagesInBucket() {
+		const { data, error } = await this.client.storage
+			.from(SupabaseConnection.IMAGES_STORAGE_NAME)
+			.list(null, {
+				limit: 120,
+				offset: 0,
+			});
+
+		if (error) throw error;
+		return data;
+	}
 }
 
 const supabase = new SupabaseConnection();
