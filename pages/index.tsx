@@ -18,6 +18,8 @@ import { useEffect, useRef, useState } from "react";
 
 import supabase from "../models/supabase-connection";
 
+declare const pa;
+
 interface Props {
 	latestImages: ImageInfoObjLocal[];
 	totalDownloadCount: number;
@@ -105,7 +107,10 @@ export default function Home(props: Props) {
 	};
 
 	const updateSelectedCategory = (category: ImageCategoryLocal) => {
-		setImageGalleryOptions({ ...imageGalleryOptions, category });
+		if (category != imageGalleryOptions.category) {
+			pa.track({ name: "View Category", unit: category });
+			setImageGalleryOptions({ ...imageGalleryOptions, category });
+		}
 	};
 
 	useEffect(() => {

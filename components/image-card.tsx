@@ -16,7 +16,7 @@ const imgixLoader = ({ src, width, quality }): string => {
 
 export default function ImageCard(props: Props) {
 	const down = () => {
-		pa.track({ name: "Image Download", value: props.downloadFilename });
+		pa.track({ name: "Image Download", unit: props.downloadFilename });
 	};
 
 	return (
