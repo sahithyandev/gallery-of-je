@@ -10,7 +10,7 @@ import {
 } from "../types";
 import { ImageGallery } from "../models/image-gallery";
 
-import JE from "../assets/JE.png";
+import me from "../assets/me.png";
 import GalleryOfJE from "../assets/gallery-of-je.png";
 import { InstagramIcon } from "../assets/icons";
 import styles from "../styles/Home.module.css";
@@ -136,9 +136,9 @@ export default function Home(props: Props) {
 			<main className={styles.main}>
 				<div className={styles.profileCard}>
 					<img
-						src={JE.src}
-						width={JE.width}
-						height={JE.height}
+						src={me.src}
+						width={me.width}
+						height={me.height}
 						className={styles.profileCard_image}
 					/>
 					<img
@@ -218,6 +218,7 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
 	const THUMBNAIL_QUALITY = 8; //40;
 
 	const latestImages = await supabase.getAllImages();
+	console.log("total images count", latestImages.length);
 
 	const thumbFunc = async (imageUrl: string) => {
 		const imageResponse = await fetch(imageUrl);
@@ -253,8 +254,10 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
 			} as ImageInfoObjLocal;
 		})
 	);
+	console.log(latestImagesLocal.length);
 
 	const totalDownloadCount = await supabase.totalDownloadCount();
+	console.log("total downloads count", totalDownloadCount);
 
 	return {
 		props: {
