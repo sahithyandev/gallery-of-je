@@ -71,6 +71,7 @@ function checkIfAvailableOnServer(filename: string, debugNote: string) {
 					// test if its a image and if its
 					return /JE-\w{6}.(jpe?g|png)/i.test(fileName);
 				});
+
 				images.forEach((image) => {
 					imageFiles.push({ name: image, category });
 					_imageFiles.push(image);
@@ -111,11 +112,12 @@ function checkIfAvailableOnServer(filename: string, debugNote: string) {
 		});
 
 		const imagesOnStorageBucket = await supabase.getAllImagesInBucket();
-		const _imagesOnStorageBucket = imagesOnStorageBucket.map((f) => f.name);
 		if (imagesOnDB.length !== imagesOnStorageBucket.length) {
 			console.log(
 				`Storage bucket has ${imagesOnStorageBucket.length} images but the database has ${imagesOnDB.length} images`
 			);
+
+			const _imagesOnStorageBucket = imagesOnStorageBucket.map((f) => f.name);
 
 			_imagesOnDB.forEach((file) => {
 				if (!_imagesOnStorageBucket.includes(file)) {
@@ -151,7 +153,7 @@ function checkIfAvailableOnServer(filename: string, debugNote: string) {
 
 				if (file.category !== localFileCategory) {
 					console.log(
-						`${file.downloadFilename} is found on the database ${file.category} and locally ${localFileCategory} but their categories doesn't match`
+						`${file.downloadFilename} is found on the database (${file.category}) and locally (${localFileCategory}) but their categories doesn't match`
 					);
 					return;
 				}
@@ -159,18 +161,8 @@ function checkIfAvailableOnServer(filename: string, debugNote: string) {
 
 			imageFiles.forEach((file) => {
 				if (!_imagesOnDB.includes(file.name)) {
-					console.log(`${file} is saved locally, but not on the database`);
+					console.log(`${file.name} is saved locally, but not on the database`);
 					return;
-				}
-
-				const dbFileCategory = imagesOnDB.find(
-					(f) => f.downloadFilename === file.name
-				).category;
-
-				if (file.category !== dbFileCategory) {
-					console.log(
-						`${file.name} is found on the database ${file.category} and locally ${dbFileCategory} but their categories doesn't match`
-					);
 				}
 			});
 		}

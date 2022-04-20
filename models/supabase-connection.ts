@@ -132,7 +132,7 @@ class SupabaseConnection {
 		const { data, error } = await this.client.storage
 			.from(SupabaseConnection.IMAGES_STORAGE_NAME)
 			.list(null, {
-				limit: 120,
+				limit: 200,
 				offset: 0,
 			});
 

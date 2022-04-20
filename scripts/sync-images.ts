@@ -10,6 +10,7 @@ const CMD_OPTIONS = {
 	NO_RENAME: "--no-rename",
 	NO_UPLOAD: "--no-upload",
 	NO_VERCEL_DEPLOY: "--no-vercel-deploy",
+	DRY: "--dry",
 };
 
 const IMAGES_DIR = join(__dirname, "./../images");
@@ -44,7 +45,7 @@ function randomString(
 
 let alreadyUsedFileIds = [];
 
-async function renameFile(imgFilePath: string, NO_UPLOAD: boolean) {
+async function renameFile(imgFilePath: string, NO_RENAME: boolean) {
 	const fileId = randomString(
 		6,
 		CHARACTERS.numbers + CHARACTERS.alphabets,
@@ -56,9 +57,9 @@ async function renameFile(imgFilePath: string, NO_UPLOAD: boolean) {
 	const imgFolderPath = imgFilePath.split(sep).slice(0, -1).join(sep);
 	const newImgFilePath = join(imgFolderPath, `JE-${fileId}${fileExtension}`);
 
-	console.log("renaming", imgFilePath, "--->", newImgFilePath);
+	console.log(`RENAME:`, imgFilePath, "--->", newImgFilePath);
 
-	if (!NO_UPLOAD) {
+	if (!NO_RENAME) {
 		await rename(imgFilePath, newImgFilePath);
 	}
 
@@ -70,11 +71,21 @@ interface ImageFileObj {
 	category: ImageCategory;
 }
 
+// TODO upload each file after renaming
 (async () => {
 	const cmdParams = process.argv.slice(2);
-	const NO_RENAME = cmdParams.includes(CMD_OPTIONS.NO_RENAME);
-	const NO_UPLOAD = cmdParams.includes(CMD_OPTIONS.NO_UPLOAD);
-	const NO_VERCEL_DEPLOY = cmdParams.includes(CMD_OPTIONS.NO_VERCEL_DEPLOY);
+	const DRY = cmdParams.includes(CMD_OPTIONS.DRY);
+	const NO_RENAME = DRY || cmdParams.includes(CMD_OPTIONS.NO_RENAME);
+	const NO_UPLOAD = DRY || cmdParams.includes(CMD_OPTIONS.NO_UPLOAD);
+	const NO_VERCEL_DEPLOY =
+		DRY || cmdParams.includes(CMD_OPTIONS.NO_VERCEL_DEPLOY);
+
+	if (DRY) {
+		console.warn(
+			"INFO",
+			`${CMD_OPTIONS.DRY} has been passed. This will turn on the dry mode.`
+		);
+	}
 
 	if (NO_RENAME) {
 		console.warn(
@@ -183,11 +194,13 @@ interface ImageFileObj {
 
 		// add to database
 		await supabase.addImageInfo(imageInfoArr);
+		console.log(`${newImages.length} images added to the database`);
 
 		// vercel deploy
 		if (!NO_VERCEL_DEPLOY) {
 			require("isomorphic-fetch");
 			if (newImages.length > 0) {
+				console.log("Triggering new vercel deploy...");
 				fetch(process.env.IMAGES_ADDED_DEPLOY_HOOK);
 			}
 		}
