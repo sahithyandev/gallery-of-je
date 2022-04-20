@@ -1,5 +1,6 @@
 export const ImageCategoryValues: string[] = [
 	"sports",
+	"nature",
 	"wallpapers",
 	"tv-shows",
 	"kollywood",
@@ -8,6 +9,7 @@ export const ImageCategoryValues: string[] = [
 
 export type ImageCategory =
 	| "sports"
+	| "nature"
 	| "wallpapers"
 	| "tv-shows"
 	| "kollywood"
