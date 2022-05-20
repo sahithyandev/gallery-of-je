@@ -1,11 +1,10 @@
 import { readdir, rename, stat } from "fs/promises";
 import { join, extname, sep } from "path";
 
-import sharp from "sharp";
-
 import supabase from "../models/supabase-connection";
 import { ImageCategory, ImageInfoObj } from "../types";
 import { IMAGES_DIR } from "../config";
+import { IMG_FILENAME_PATTERN, isImage, isJEImage, metadata } from "./helpers";
 
 const CMD_OPTIONS = {
 	NO_RENAME: "--no-rename",
@@ -129,10 +128,7 @@ interface ImageFileObj {
 	for (const category of imageCategoryFolders) {
 		try {
 			const files = await readdir(join(IMAGES_DIR, category));
-			const images = files.filter((fileName) => {
-				// test if its a image
-				return /\.(jpe?g|png)$/i.test(fileName);
-			});
+			const images = files.filter((fileName) => isImage(fileName));
 			images.forEach((image) => {
 				imageFiles.push({ name: image, category });
 			});
@@ -152,11 +148,10 @@ interface ImageFileObj {
 	// validate names
 	const validatedImgFiles: ImageFileObj[] = [];
 	for (const imgFileObj of imageFiles) {
-		const IMG_FILENAME_PATTERN = /JE-(?<fileId>\w{6})\.\w+/;
 		const imgFile = imgFileObj.name;
 		const fullFilePath = join(IMAGES_DIR, imgFileObj.category, imgFile);
 
-		if (!IMG_FILENAME_PATTERN.test(imgFile)) {
+		if (!isJEImage(imgFile)) {
 			const newImgFileName = await renameFile(fullFilePath, NO_RENAME);
 
 			newImages.push(imgFile);
@@ -185,13 +180,13 @@ interface ImageFileObj {
 					console.log(`Error occured (${file})`, e);
 				}
 
-				const lastModTime = (await stat(file)).mtime;
-				const { width, height } = await sharp(file).metadata();
+				const meta = await metadata(file);
+
 				return {
 					downloadFilename: fileName,
-					width,
-					height,
-					addedOn: lastModTime,
+					width: meta.width,
+					height: meta.height,
+					addedOn: meta.lastModifiedTime,
 					category: fileObj.category,
 				} as ImageInfoObj;
 			})

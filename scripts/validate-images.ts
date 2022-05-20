@@ -5,6 +5,7 @@ import supabase from "../models/supabase-connection";
 import { ImageCategory, ImageInfoObj } from "../types";
 
 import { IMAGES_DIR, IMG_CDN_URL } from "../config";
+import { isImage, isJEImage } from "./helpers";
 require("isomorphic-fetch");
 
 interface ImageFileObj {
@@ -77,10 +78,9 @@ function checkIfAvailableOnServer(filename: string, debugNote: string) {
 		for (const category of imageCategoryFolders) {
 			try {
 				const files = await readdir(join(IMAGES_DIR, category));
-				const images = files.filter((fileName) => {
-					// test if its a image and if its
-					return /JE-\w{6}.(jpe?g|png)/i.test(fileName);
-				});
+				const images = files.filter(
+					(fileName) => isImage(fileName) && isJEImage(fileName)
+				);
 
 				images.forEach((image) => {
 					imageFiles.push({ name: image, category });

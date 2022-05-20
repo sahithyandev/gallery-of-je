@@ -1,11 +1,12 @@
 import { readdir, stat } from "fs/promises";
 import { join, extname, sep } from "path";
 
+require("isomorphic-fetch");
+
 import supabase from "../models/supabase-connection";
 import { ImageCategory, ImageInfoObj } from "../types";
-import { IMAGES_DIR, IMG_CDN_URL } from "../config";
-import sharp from "sharp";
-require("isomorphic-fetch");
+import { IMAGES_DIR } from "../config";
+import { isImage, isJEImage, isOnStorage, metadata } from "./helpers";
 
 interface ImageFileObj {
 	name: string;
@@ -18,12 +19,6 @@ interface ImageFileObj {
 const CMD_OPTIONS = {
 	NO_VERCEL_DEPLOY: "--no-vercel-deploy",
 };
-
-async function isOnStorage(filename: string): Promise<boolean> {
-	const response = await fetch(`${IMG_CDN_URL}/${filename}`);
-
-	return response.status == 200;
-}
 
 (async () => {
 	const cmdParams = process.argv.slice(2);
@@ -58,15 +53,9 @@ async function isOnStorage(filename: string): Promise<boolean> {
 	for (const category of ImageCategoryFolders) {
 		try {
 			const files = await readdir(join(IMAGES_DIR, category));
-			const images = files
-				.filter((filename) => {
-					// test if its a image
-					return /\.(jpe?g|png)/i.test(filename);
-				})
-				.filter((filename) => {
-					// test if it matches JE-xxxxxx name
-					return /JE-(?<fileId>\w{6}\.\w+)/.test(filename);
-				});
+			const images = files.filter(
+				(filename) => isImage(filename) && isJEImage(filename)
+			);
 
 			await Promise.all(
 				images.map(async (image) => {
@@ -102,14 +91,13 @@ async function isOnStorage(filename: string): Promise<boolean> {
 		await supabase.addImageInfo(
 			await Promise.all(
 				notFoundOnDB.map(async (file) => {
-					const lastModTime = (await stat(file.path)).mtime;
-					const { width, height } = await sharp(file.path).metadata();
+					const meta = await metadata(file.path);
 
 					return {
 						downloadFilename: file.name,
-						width,
-						height,
-						addedOn: lastModTime,
+						width: meta.width,
+						height: meta.height,
+						addedOn: meta.lastModifiedTime,
 						category: file.category,
 					} as ImageInfoObj;
 				})
