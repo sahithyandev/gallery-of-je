@@ -56,6 +56,17 @@ class SupabaseConnection {
 		if (error) throw error;
 	}
 
+	async isImageOnDatabase(imgFileName: string) {
+		const { data, error } = await this.client
+			.from<ImageInfoObj>(SupabaseConnection.IMAGE_INFO_COLLECTION)
+			.select()
+			.eq("downloadFilename", imgFileName)
+			.maybeSingle();
+
+		if (error) throw error;
+		return data != null;
+	}
+
 	async hasImageAlreadyUploaded(imgFilePath: string): Promise<boolean> {
 		const filename = imgFilePath.split(sep).reverse()[0];
 		const { data, error } = await this.client.storage
