@@ -5,6 +5,7 @@ import sharp from "sharp";
 
 import supabase from "../models/supabase-connection";
 import { ImageCategory, ImageInfoObj } from "../types";
+import { IMAGES_DIR } from "../config";
 
 const CMD_OPTIONS = {
 	NO_RENAME: "--no-rename",
@@ -13,7 +14,6 @@ const CMD_OPTIONS = {
 	DRY: "--dry",
 };
 
-const IMAGES_DIR = join(__dirname, "./../images");
 const CHARACTERS = {
 	alphabets: "abcdefghijklmnopqrstuvwxyz",
 	numbers: "0123456789",
@@ -178,7 +178,12 @@ interface ImageFileObj {
 			validatedImgFiles.map(async (fileObj) => {
 				const file = fileObj.name;
 				// upload storage
-				const fileName = await supabase.uploadImage(file);
+				var fileName;
+				try {
+					fileName = await supabase.uploadImage(file);
+				} catch (e) {
+					console.log(`Error occured (${file})`, e);
+				}
 
 				const lastModTime = (await stat(file)).mtime;
 				const { width, height } = await sharp(file).metadata();
@@ -192,9 +197,14 @@ interface ImageFileObj {
 			})
 		);
 
+		console.log("should upload now");
+
 		// add to database
-		await supabase.addImageInfo(imageInfoArr);
-		console.log(`${newImages.length} images added to the database`);
+		try {
+			await supabase.addImageInfo(imageInfoArr);
+		} catch (e) {
+			console.log(e);
+		}
 
 		// vercel deploy
 		if (!NO_VERCEL_DEPLOY) {

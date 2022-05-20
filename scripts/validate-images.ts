@@ -15,6 +15,7 @@ interface ImageFileObj {
 const CMD_OPTIONS = {
 	NO_LOCAL: "--no-local",
 	NO_DB: "--no-db",
+	RENAME_LOCAL_IF_NOT_FOUND: "--rename-local",
 };
 
 function checkIfAvailableOnServer(filename: string, debugNote: string) {
@@ -29,6 +30,9 @@ function checkIfAvailableOnServer(filename: string, debugNote: string) {
 	const cmdParams = process.argv.slice(2);
 	const NO_LOCAL = cmdParams.includes(CMD_OPTIONS.NO_LOCAL);
 	const NO_DB = cmdParams.includes(CMD_OPTIONS.NO_DB);
+	const RENAME_LOCAL_IF_NOT_FOUND = cmdParams.includes(
+		CMD_OPTIONS.RENAME_LOCAL_IF_NOT_FOUND
+	);
 
 	if (NO_LOCAL) {
 		console.warn(
@@ -41,6 +45,12 @@ function checkIfAvailableOnServer(filename: string, debugNote: string) {
 		console.warn(
 			"INFO",
 			`${CMD_OPTIONS.NO_DB} has been passed. This will keep the script from checking files on the database.`
+		);
+	}
+	if (RENAME_LOCAL_IF_NOT_FOUND) {
+		console.warn(
+			"INFO",
+			`${CMD_OPTIONS.RENAME_LOCAL_IF_NOT_FOUND} has been passed. This will rename the local files which don't exist in the storage`
 		);
 	}
 

@@ -12,6 +12,8 @@ class SupabaseConnection {
 	static PUBLIC_IMAGE_STORAGE =
 		"https://erwfxmftkzktexefxtdy.supabase.in/storage/v1/object/public/images";
 	static IMAGE_CACHE_CONTROL_TIME = (3 * 60 * 60).toString();
+	// TODO make this const obselete
+	static IMAGES_COUNT = 220;
 
 	constructor() {
 		const SUPABASE_URL = process.env.SUPABASE_URL || "";
@@ -72,7 +74,7 @@ class SupabaseConnection {
 		const { data, error } = await this.client.storage
 			.from(SupabaseConnection.IMAGES_STORAGE_NAME)
 			.list(null, {
-				limit: 120,
+				limit: SupabaseConnection.IMAGES_COUNT,
 			});
 
 		if (error) throw error;
@@ -143,7 +145,7 @@ class SupabaseConnection {
 		const { data, error } = await this.client.storage
 			.from(SupabaseConnection.IMAGES_STORAGE_NAME)
 			.list(null, {
-				limit: 200,
+				limit: SupabaseConnection.IMAGES_COUNT,
 				offset: 0,
 			});
 
