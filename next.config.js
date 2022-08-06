@@ -2,7 +2,7 @@ module.exports = {
 	images: {
 		domains: ["erwfxmftkzktexefxtdy.supabase.in", "gallery-of-je.imgix.net"],
 	},
-	staticPageGenerationTimeout: 5000,
+	staticPageGenerationTimeout: 7000,
 	webpack: (config, { dev, isServer }) => {
 		// Replace React with Preact only in client production build
 		if (!dev && !isServer) {
