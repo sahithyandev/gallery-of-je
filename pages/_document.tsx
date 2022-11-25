@@ -36,14 +36,6 @@ export default class MyDocument extends Document {
 						sizes="16x16"
 						href="/favicon-16x16.png"
 					/>
-					<script
-						data-host="https://microanalytics.io"
-						data-dnt="false"
-						src="https://microanalytics.io/js/script.js"
-						id="ZwSg9rf6GA"
-						async
-						defer
-					></script>
 
 					{/* OG tags */}
 					<meta property="og:title" content="Gallery Of JE" />
